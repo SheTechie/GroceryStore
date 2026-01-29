@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { useProducts } from '../hooks/useProducts';
 import { ProductList } from '../components/ProductList';
 import { Category } from '../types';
@@ -42,7 +41,7 @@ export const Home: React.FC = () => {
     };
 
     filterProducts();
-  }, [products, selectedCategory, debouncedSearch]);
+  }, [products, selectedCategory, debouncedSearch, contextProducts]);
 
   return (
     <div className="home-page">

@@ -1,7 +1,7 @@
 import { CartItem } from '../types';
 
 import { formatCurrency } from './currency';
-import { formatCartQuantityPlain, getLineTotal, getUnitKind } from './units';
+import { formatCartQuantityPlain, getUnitKind } from './units';
 
 export function generateWhatsAppMessage(items: CartItem[], total: number, showPrices: boolean = true): string {
   let message = '🛒 *My Grocery List*\n\n';

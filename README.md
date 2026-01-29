@@ -165,6 +165,51 @@ This app demonstrates:
 - All images use Unsplash placeholder URLs
 - Form validation includes email format checking
 
+## 🚀 Deployment
+
+### Deploy to Vercel
+
+This app is configured for easy deployment on Vercel.
+
+#### Option 1: Deploy via Vercel Dashboard (Recommended)
+
+1. Push your code to GitHub
+2. Go to [Vercel Dashboard](https://vercel.com/dashboard)
+3. Click "Add New Project"
+4. Import your GitHub repository
+5. Vercel will auto-detect the settings:
+   - Framework Preset: Create React App
+   - Build Command: `npm run build`
+   - Output Directory: `build`
+6. Click "Deploy"
+
+#### Option 2: Deploy via Vercel CLI
+
+1. Install Vercel CLI:
+   ```bash
+   npm i -g vercel
+   ```
+
+2. Login to Vercel:
+   ```bash
+   vercel login
+   ```
+
+3. Deploy:
+   ```bash
+   vercel
+   ```
+
+4. For production deployment:
+   ```bash
+   vercel --prod
+   ```
+
+The `vercel.json` configuration file handles:
+- SPA routing (all routes redirect to `index.html` for React Router)
+- Cache headers for static assets
+- Build settings
+
 ## 🚀 Future Enhancements
 
 - [ ] User authentication

@@ -87,7 +87,7 @@ export const CartItem: React.FC<CartItemProps> = ({ item }) => {
               min={1}
               aria-label="Quantity"
             />
-            {kind === 'weight' || kind === 'volume' && (
+            {(kind === 'weight' || kind === 'volume') && (
               <span className="quantity-hint">
                 {formatCartQuantity(product, quantity, t)}
               </span>

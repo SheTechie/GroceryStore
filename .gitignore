@@ -72,3 +72,6 @@ dist
 # Temporary folders
 tmp/
 temp/
+
+# Vercel
+.vercel

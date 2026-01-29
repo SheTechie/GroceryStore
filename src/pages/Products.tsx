@@ -39,7 +39,7 @@ export const Products: React.FC = () => {
     };
 
     filterProducts();
-  }, [products, selectedCategory, debouncedSearch]);
+  }, [products, selectedCategory, debouncedSearch, contextProducts]);
 
   return (
     <div className="products-page">

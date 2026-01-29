@@ -1,5 +1,5 @@
 import React, { createContext, useContext, ReactNode } from 'react';
-import { Product, Category } from '../types';
+import { Product } from '../types';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { mockProducts } from '../data/mockProducts';
 
