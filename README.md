@@ -176,6 +176,3 @@ This app demonstrates:
 - [ ] Payment integration
 - [ ] Backend API integration
 
----
-
-Built with ❤️ for learning React and TypeScript
