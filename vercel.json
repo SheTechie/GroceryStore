@@ -17,5 +17,9 @@
         }
       ]
     }
-  ]
+  ],
+  "env": {
+    "NODE_OPTIONS": "--no-deprecation",
+    "NPM_CONFIG_LOGLEVEL": "error"
+  }
 }
