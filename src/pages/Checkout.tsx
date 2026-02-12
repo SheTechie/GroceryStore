@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { CheckoutFormData, PaymentResponse, DeliveryType } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { formatCurrency } from '../utils/currency';
 import { Payment } from '../components/Payment';
-import { 
-  checkDeliveryAvailability, 
+import {
+  checkDeliveryAvailability,
   validateDeliveryRequirements,
   calculateDeliveryCharge,
-  DELIVERY_MIN_ORDER 
+  DELIVERY_MIN_ORDER
 } from '../services/deliveryService';
 import './Checkout.css';
 
@@ -40,60 +40,72 @@ export const Checkout: React.FC = () => {
   }>({ checking: false, available: true });
 
   const total = getTotalPrice();
-  
+
   // Calculate delivery charge
   const deliveryCharge = formData.deliveryType === 'delivery' && deliveryStatus.distance
     ? calculateDeliveryCharge(total, deliveryStatus.distance)
     : 0;
-  
+
   const finalTotal = total + deliveryCharge;
 
   // Check delivery availability when zipcode, address, or delivery type changes
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    if (formData.deliveryType === 'delivery' && formData.zipCode.trim().length === 6) {
-      checkDelivery();
-    } else {
-      setDeliveryStatus({ checking: false, available: true });
-    }
-  }, [formData.zipCode, formData.deliveryType, formData.address, formData.city, total]);
+const checkDelivery = useCallback(async () => {
+  setDeliveryStatus({ checking: true, available: false });
 
-  const checkDelivery = async () => {
-    setDeliveryStatus({ checking: true, available: false });
-    const result = await checkDeliveryAvailability(
-      formData.zipCode,
-      formData.address,
-      formData.city
-    );
-    
-    // Recalculate delivery charge with current order total
-    const charge = result.available && result.distance
+  const result = await checkDeliveryAvailability(
+    formData.zipCode,
+    formData.address,
+    formData.city
+  );
+
+  const charge = result.available && result.distance
       ? calculateDeliveryCharge(total, result.distance)
       : 0;
-    
-    setDeliveryStatus({
-      checking: false,
-      available: result.available,
-      message: result.message,
-      distance: result.distance,
-      deliveryCharge: charge,
-    });
-  };
+
+  setDeliveryStatus({
+    checking: false,
+    available: result.available,
+    message: result.message,
+    distance: result.distance,
+    deliveryCharge: charge,
+  });
+}, [
+  formData.zipCode,
+  formData.address,
+  formData.city,
+  total
+]);
+
+useEffect(() => {
+  if (
+    formData.deliveryType === 'delivery' &&
+    formData.zipCode.trim().length === 6
+  ) {
+    checkDelivery();
+  } else {
+    setDeliveryStatus({ checking: false, available: true });
+  }
+}, [
+  formData.deliveryType,
+  formData.zipCode,
+  checkDelivery
+]);
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     let processedValue: string | DeliveryType = value;
-    
+
     // Format phone number (only digits)
     if (name === 'phone') {
       processedValue = value.replace(/\D/g, '').slice(0, 10);
     }
-    
+
     // Format zipcode (only digits)
     if (name === 'zipCode') {
       processedValue = value.replace(/\D/g, '').slice(0, 6);
     }
-    
+
     // Handle delivery type change - reset payment method appropriately
     if (name === 'deliveryType') {
       const deliveryType = value as DeliveryType;
@@ -105,7 +117,7 @@ export const Checkout: React.FC = () => {
     } else {
       setFormData(prev => ({ ...prev, [name]: processedValue }));
     }
-    
+
     // Clear error when user starts typing
     if (errors[name as keyof CheckoutFormData]) {
       setErrors(prev => ({ ...prev, [name]: undefined }));
@@ -118,12 +130,12 @@ export const Checkout: React.FC = () => {
     if (!formData.name.trim()) {
       newErrors.name = t('validation.name.required');
     }
-    
+
     // Email is optional, but if provided, must be valid
     if (formData.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = t('validation.email.invalid');
     }
-    
+
     // Phone number is mandatory
     if (!formData.phone.trim()) {
       newErrors.phone = 'Phone number is required';
@@ -163,7 +175,7 @@ export const Checkout: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validate()) {
       return;
     }
@@ -181,7 +193,7 @@ export const Checkout: React.FC = () => {
 
   const handlePayAtStoreOrder = () => {
     setIsSubmitting(true);
-    
+
     // Create a payment response for pay at store
     const paymentResponse: PaymentResponse = {
       success: true,
@@ -200,7 +212,7 @@ export const Checkout: React.FC = () => {
       total: finalTotal,
       paymentMethod: 'pay_at_store',
     }));
-    
+
     // Clear cart and redirect
     clearCart();
     navigate('/order-success');
@@ -217,7 +229,7 @@ export const Checkout: React.FC = () => {
       total: finalTotal,
       distance: deliveryStatus.distance,
     }));
-    
+
     // Clear cart and redirect
     clearCart();
     navigate('/order-success');
@@ -255,7 +267,7 @@ export const Checkout: React.FC = () => {
           <form onSubmit={handleSubmit} className="checkout-form">
             <div className="form-section">
               <h2>Contact Information</h2>
-              
+
               <div className="form-group">
                 <label htmlFor="name">{t('checkout.name')} *</label>
                 <input
@@ -301,7 +313,7 @@ export const Checkout: React.FC = () => {
 
             <div className="form-section">
               <h2>Delivery Option</h2>
-              
+
               <div className="delivery-options">
                 <label className={`delivery-option ${formData.deliveryType === 'pickup' ? 'selected' : ''}`}>
                   <input
@@ -357,7 +369,7 @@ export const Checkout: React.FC = () => {
             {formData.deliveryType === 'delivery' && (
               <div className="form-section">
                 <h2>Delivery Address</h2>
-                
+
                 <div className="form-group">
                   <label htmlFor="address">{t('checkout.address')} *</label>
                   <input
@@ -424,7 +436,7 @@ export const Checkout: React.FC = () => {
 
             <div className="form-section">
               <h2>{t('checkout.payment.method')}</h2>
-              
+
               {formData.deliveryType === 'pickup' && (
                 <div className="form-group">
                   <label className="payment-option-label">
@@ -442,7 +454,7 @@ export const Checkout: React.FC = () => {
                   </label>
                 </div>
               )}
-              
+
               <div className="form-group">
                 <label>
                   <input
@@ -501,13 +513,13 @@ export const Checkout: React.FC = () => {
               )}
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="submit-btn"
               disabled={isSubmitting}
             >
-              {isSubmitting 
-                ? t('checkout.processing') 
+              {isSubmitting
+                ? t('checkout.processing')
                 : formData.deliveryType === 'pickup' && formData.paymentMethod === 'pay_at_store'
                   ? `Place Order - ${formatCurrency(finalTotal)}`
                   : `${t('checkout.continue.to.payment')} - ${formatCurrency(finalTotal)}`}
@@ -580,7 +592,7 @@ export const Checkout: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       {showPayment && formData.paymentMethod !== 'pay_at_store' && (
         <Payment
           amount={finalTotal}
