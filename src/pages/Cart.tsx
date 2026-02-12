@@ -15,6 +15,7 @@ export const Cart: React.FC = () => {
   const navigate = useNavigate();
   const total = getTotalPrice();
   const [showPreview, setShowPreview] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const handleCheckout = () => {
     navigate('/checkout');
@@ -27,6 +28,15 @@ export const Cart: React.FC = () => {
 
   const handleShowPreview = () => {
     setShowPreview(true);
+  };
+
+  const handleClearCart = () => {
+    setShowClearConfirm(true);
+  };
+
+  const confirmClearCart = () => {
+    clearCart();
+    setShowClearConfirm(false);
   };
 
   const whatsappMessage = generateWhatsAppMessage(items, total, showPrices);
@@ -50,8 +60,8 @@ export const Cart: React.FC = () => {
       <div className="cart-container">
         <div className="cart-header">
           <h1>{t('cart.title')}</h1>
-          <button onClick={clearCart} className="clear-cart-btn">
-            {t('cart.clear')}
+          <button onClick={handleClearCart} className="clear-cart-btn">
+            🗑️ {t('cart.clear')}
           </button>
         </div>
 
@@ -92,6 +102,12 @@ export const Cart: React.FC = () => {
               >
                 📱 {t('cart.share.whatsapp')}
               </button>
+              <button 
+                onClick={handleClearCart}
+                className="empty-cart-btn"
+              >
+                🗑️ Empty Cart
+              </button>
               <Link to="/products" className="continue-shopping">
                 {t('cart.continue.shopping')}
               </Link>
@@ -99,6 +115,29 @@ export const Cart: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {showClearConfirm && (
+        <div className="confirm-modal" onClick={() => setShowClearConfirm(false)}>
+          <div className="confirm-modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Clear Cart?</h3>
+            <p>Are you sure you want to remove all items from your cart? This action cannot be undone.</p>
+            <div className="confirm-modal-actions">
+              <button 
+                onClick={() => setShowClearConfirm(false)}
+                className="cancel-btn"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmClearCart}
+                className="confirm-btn"
+              >
+                Clear Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showPreview && (
         <div className="whatsapp-preview-modal" onClick={() => setShowPreview(false)}>

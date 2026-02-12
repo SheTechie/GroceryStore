@@ -76,52 +76,52 @@ export const mockProducts: Product[] = [
   // 🌱 Pulses / Dal
   {
     id: 8,
-    name: "Toor Dal (Arhar)",
+    name: "Arhar dal, Toor dal, Tuvar dal",
     price: 120.00,
     category: "pulses",
     inStock: true,
-    image: "https://images.unsplash.com/photo-1593111774240-d529f1b47f97?w=400",
-    description: "Toor dal (Arhar), 1kg",
+    image: "/images/split_pigeon_peas_arhar_toor_types_of_lentils_list_in_english_hindi.jpg",
+    description: "Premium quality Arhar dal (Toor dal/Tuvar dal), 1kg",
     rating: 4.6
   },
   {
     id: 9,
-    name: "Moong Dal (Yellow)",
+    name: "Moong dal",
     price: 110.00,
     category: "pulses",
     inStock: true,
-    image: "https://images.unsplash.com/photo-1593111774240-d529f1b47f97?w=400",
-    description: "Yellow moong dal, 1kg",
+    image: "/images/yellow_lentils_moong_mung_types_of_lentils_list_in_english_hindi.jpg",
+    description: "Premium quality yellow moong dal, 1kg",
     rating: 4.5
   },
   {
     id: 10,
-    name: "Masoor Dal",
+    name: "Lal masoor dal",
     price: 95.00,
     category: "pulses",
     inStock: true,
-    image: "https://images.unsplash.com/photo-1593111774240-d529f1b47f97?w=400",
-    description: "Red lentil (Masoor dal), 1kg",
+    image: "/images/red_lentil_lal_masoor_types_of_lentils_list_in_english_hindi.jpg",
+    description: "Red lentil (Lal masoor dal), 1kg",
     rating: 4.4
   },
   {
     id: 11,
-    name: "Chana Dal",
+    name: "Chana dal",
     price: 105.00,
     category: "pulses",
     inStock: true,
-    image: "https://images.unsplash.com/photo-1593111774240-d529f1b47f97?w=400",
-    description: "Split chickpea dal, 1kg",
+    image: "/images/split_bengal_gram_chana_dal_types_of_lentils_list_in_english_hindi.jpg",
+    description: "Split chickpea dal (Chana dal), 1kg",
     rating: 4.5
   },
   {
     id: 12,
-    name: "Urad Dal",
+    name: "Urad dal",
     price: 130.00,
     category: "pulses",
     inStock: true,
-    image: "https://images.unsplash.com/photo-1593111774240-d529f1b47f97?w=400",
-    description: "Black gram dal, 1kg",
+    image: "/images/split_black_gram_urad_dal_chilka_types_of_lentils_list_in_english_hindi-1.jpg",
+    description: "Black gram dal (Urad dal), 1kg",
     rating: 4.6
   },
   {
@@ -130,7 +130,7 @@ export const mockProducts: Product[] = [
     price: 140.00,
     category: "pulses",
     inStock: true,
-    image: "https://images.unsplash.com/photo-1593111774240-d529f1b47f97?w=400",
+    image: "/images/kidney-beans-dark.webp",
     description: "Kidney beans (Rajma), 1kg",
     rating: 4.5
   },
@@ -140,9 +140,129 @@ export const mockProducts: Product[] = [
     price: 125.00,
     category: "pulses",
     inStock: true,
-    image: "https://images.unsplash.com/photo-1593111774240-d529f1b47f97?w=400",
+    image: "/images/white-chickpeas.webp",
     description: "White chickpeas (Chole), 1kg",
     rating: 4.5
+  },
+  {
+    id: 61,
+    name: "Black Beans",
+    price: 145.00,
+    category: "pulses",
+    inStock: true,
+    image: "/images/black-bean.jpg",
+    description: "Black beans, 1kg",
+    rating: 4.5
+  },
+  {
+    id: 62,
+    name: "Black Chickpeas (Kala Chana)",
+    price: 135.00,
+    category: "pulses",
+    inStock: true,
+    image: "/images/black-chickpeas.jpg",
+    description: "Black chickpeas (Kala chana), 1kg",
+    rating: 4.6
+  },
+  {
+    id: 63,
+    name: "Black Eyed Beans (Lobia)",
+    price: 120.00,
+    category: "pulses",
+    inStock: true,
+    image: "/images/black-eyed-beans.webp",
+    description: "Black eyed beans (Lobia), 1kg",
+    rating: 4.4
+  },
+  {
+    id: 64,
+    name: "Green Chana (Hara Chana)",
+    price: 130.00,
+    category: "pulses",
+    inStock: true,
+    image: "/images/green-chana.webp",
+    description: "Green chickpeas (Hara chana), 1kg",
+    rating: 4.5
+  },
+  {
+    id: 65,
+    name: "Green Peas (Matar)",
+    price: 90.00,
+    category: "pulses",
+    inStock: true,
+    image: "/images/green-peas.webp",
+    description: "Green peas (Matar), 1kg",
+    rating: 4.4
+  },
+  {
+    id: 66,
+    name: "Pinto Beans",
+    price: 150.00,
+    category: "pulses",
+    inStock: true,
+    image: "/images/pinto-bean.jpg",
+    description: "Pinto beans, 1kg",
+    rating: 4.5
+  },
+  {
+    id: 67,
+    name: "Red Cow Peas (Rongi)",
+    price: 115.00,
+    category: "pulses",
+    inStock: true,
+    image: "/images/red-cow-peas.webp",
+    description: "Red cow peas (Rongi), 1kg",
+    rating: 4.4
+  },
+  {
+    id: 68,
+    name: "Roasted Chana (Bhuna Chana)",
+    price: 140.00,
+    category: "pulses",
+    inStock: true,
+    image: "/images/roasted-chana-with-husk.webp",
+    description: "Roasted chickpeas with husk (Bhuna chana), 500g",
+    rating: 4.6
+  },
+  {
+    id: 69,
+    name: "White Peas (Safed Matar)",
+    price: 95.00,
+    category: "pulses",
+    inStock: true,
+    image: "/images/white-peas.webp",
+    description: "White peas (Safed matar), 1kg",
+    rating: 4.4
+  },
+  {
+    id: 70,
+    name: "Whole Moong Beans (Sabut Moong)",
+    price: 125.00,
+    category: "pulses",
+    inStock: true,
+    image: "/images/whole-moong-beans.jpg",
+    description: "Whole green moong beans (Sabut moong), 1kg",
+    rating: 4.5
+  },
+  {
+    id: 71,
+    name: "Hari Toor (Green Pigeon Peas)",
+    price: 118.00,
+    category: "pulses",
+    inStock: true,
+    image: "/images/split_green_pigeon_peas_hari_toor_types_of_lentils_list_in_english_hindi.jpg",
+    description: "Green pigeon peas (Hari toor), 1kg",
+    rating: 4.5
+  },
+  {
+    id: 72,
+    name: "Urad Dal (Skinned)",
+    price: 135.00,
+    category: "pulses",
+    inStock: true,
+    image: "/images/split_skinned_black_gram_urad_dal_types_of_lentils_list_in_english_hindi.jpg",
+    description: "Skinned black gram dal (Urad dal), 1kg",
+    rating: 4.6
   },
 
   // 🧂 Spices & Masala
@@ -224,6 +344,36 @@ export const mockProducts: Product[] = [
     inStock: true,
     image: "https://images.unsplash.com/photo-1608039829570-1c3c4458c4d5?w=400",
     description: "Chat masala powder, 100g",
+    rating: 4.5
+  },
+  {
+    id: 73,
+    name: "Dry Ginger Powder (Sonth)",
+    price: 195.00,
+    category: "spices",
+    inStock: true,
+    image: "/images/Catch-Dry-Ginger-Powder1.webp",
+    description: "Dry ginger powder (Sonth), 200g",
+    rating: 4.6
+  },
+  {
+    id: 74,
+    name: "Fennel Powder (Saunf Powder)",
+    price: 110.00,
+    category: "spices",
+    inStock: true,
+    image: "/images/Catch-Saunf-Powder.webp",
+    description: "Fennel powder (Saunf powder), 200g",
+    rating: 4.5
+  },
+  {
+    id: 75,
+    name: "Yellow Chilli Powder",
+    price: 145.00,
+    category: "spices",
+    inStock: true,
+    image: "/images/Catch-Yellow-Chilli-Powder1.webp",
+    description: "Yellow chilli powder, 200g",
     rating: 4.5
   },
 

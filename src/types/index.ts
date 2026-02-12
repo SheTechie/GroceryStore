@@ -30,11 +30,48 @@ export interface User {
   email: string;
 }
 
+export type DeliveryType = 'pickup' | 'delivery';
+
 export interface CheckoutFormData {
   name: string;
   email: string;
+  phone: string;
+  deliveryType: DeliveryType;
   address: string;
   city: string;
   zipCode: string;
-  paymentMethod: "card" | "cash";
+  paymentMethod: PaymentMethod;
+}
+
+export type PaymentMethod = "card" | "upi" | "wallet" | "cash" | "razorpay" | "pay_at_store";
+
+export interface CardPaymentData {
+  cardNumber: string;
+  cardHolderName: string;
+  expiryDate: string;
+  cvv: string;
+}
+
+export interface UPIPaymentData {
+  upiId: string;
+}
+
+export interface WalletPaymentData {
+  walletType: "phonepe" | "paytm" | "gpay" | "amazonpay";
+  phoneNumber: string;
+}
+
+export interface PaymentData {
+  method: PaymentMethod;
+  amount: number;
+  cardData?: CardPaymentData;
+  upiData?: UPIPaymentData;
+  walletData?: WalletPaymentData;
+}
+
+export interface PaymentResponse {
+  success: boolean;
+  transactionId?: string;
+  message: string;
+  timestamp: string;
 }

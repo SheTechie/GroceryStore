@@ -14,6 +14,7 @@ import { Checkout } from './pages/Checkout';
 import { OrderSuccess } from './pages/OrderSuccess';
 import { Login } from './pages/Login';
 import { Admin } from './pages/Admin';
+import { OAuthCallback } from './pages/OAuthCallback';
 import './App.css';
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
                       <Route path="/checkout" element={<Checkout />} />
                       <Route path="/order-success" element={<OrderSuccess />} />
                       <Route path="/login" element={<Login />} />
+                      <Route path="/auth/callback" element={<OAuthCallback />} />
                       <Route
                         path="/admin"
                         element={

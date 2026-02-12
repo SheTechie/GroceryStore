@@ -69,6 +69,7 @@ const translations: Record<Language, Record<string, string>> = {
     'checkout.card': 'Credit/Debit Card',
     'checkout.cash': 'Cash on Delivery',
     'checkout.place.order': 'Place Order',
+    'checkout.continue.to.payment': 'Continue to Payment',
     'checkout.processing': 'Processing...',
     
     // Order Success
@@ -195,6 +196,7 @@ const translations: Record<Language, Record<string, string>> = {
     'checkout.card': 'क्रेडिट/डेबिट कार्ड',
     'checkout.cash': 'कैश ऑन डिलीवरी',
     'checkout.place.order': 'ऑर्डर दें',
+    'checkout.continue.to.payment': 'भुगतान पर जाएं',
     'checkout.processing': 'प्रसंस्करण...',
     
     // Order Success

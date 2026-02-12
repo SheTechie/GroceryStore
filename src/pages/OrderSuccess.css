@@ -78,6 +78,55 @@
   background: #f5f5f5;
 }
 
+.payment-details {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 24px 0;
+  text-align: left;
+}
+
+.payment-info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.payment-info-item:last-child {
+  border-bottom: none;
+}
+
+.payment-info-item .label {
+  font-weight: 600;
+  color: #666;
+  font-size: 14px;
+}
+
+.payment-info-item .value {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.success-status {
+  color: #2e7d32 !important;
+}
+
+.pay-at-store-notice {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 6px;
+  padding: 12px 16px !important;
+  margin-top: 8px;
+}
+
+.pay-at-store-notice .value {
+  color: #856404 !important;
+  font-weight: 600;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .success-container {

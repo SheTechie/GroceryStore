@@ -56,11 +56,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const getTotalItems = () => {
-    return items.reduce((total, item) => {
-      const kind = getUnitKind(item.product.unit);
-      // for weight/volume, count as 1 item line; for count units, sum counts
-      return total + (kind === 'count' || kind === 'none' ? item.quantity : 1);
-    }, 0);
+    // Return the number of distinct items (products) in the cart
+    return items.length;
   };
 
   const getTotalPrice = () => {

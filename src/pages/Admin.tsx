@@ -18,6 +18,8 @@ export const Admin: React.FC = () => {
   const [editingData, setEditingData] = useState<Partial<Product>>({});
   const [imageInputMode, setImageInputMode] = useState<'url' | 'camera'>('url');
   const cameraInputRef = useRef<HTMLInputElement | null>(null);
+  const editCameraInputRef = useRef<HTMLInputElement | null>(null);
+  const [editImageMode, setEditImageMode] = useState<'url' | 'camera'>('url');
   const [formData, setFormData] = useState({
     name: '',
     price: '',
@@ -71,13 +73,58 @@ export const Admin: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setErrors(prev => ({ ...prev, image: 'Please select an image file' }));
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setErrors(prev => ({ ...prev, image: 'Image size should be less than 5MB' }));
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = () => {
       const result = typeof reader.result === 'string' ? reader.result : '';
       setFormData(prev => ({ ...prev, image: result }));
       setErrors(prev => ({ ...prev, image: '' }));
     };
+    reader.onerror = () => {
+      setErrors(prev => ({ ...prev, image: 'Error reading image file' }));
+    };
     reader.readAsDataURL(file);
+  };
+
+  const handleEditCameraFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = typeof reader.result === 'string' ? reader.result : '';
+      setEditingData(prev => ({ ...prev, image: result }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const triggerCameraInput = () => {
+    cameraInputRef.current?.click();
+  };
+
+  const triggerEditCameraInput = () => {
+    editCameraInputRef.current?.click();
   };
   // (Search API removed)
 
@@ -144,6 +191,7 @@ export const Admin: React.FC = () => {
 
   const handleEdit = (product: Product) => {
     setEditingId(product.id);
+    setEditImageMode(product.image?.startsWith('data:') ? 'camera' : 'url');
     setEditingData({
       name: product.name,
       price: product.price,
@@ -371,14 +419,32 @@ export const Admin: React.FC = () => {
                       capture="environment"
                       onChange={handleCameraFile}
                       className="image-file-input"
+                      style={{ display: 'none' }}
                     />
+                    <button
+                      type="button"
+                      onClick={triggerCameraInput}
+                      className="camera-trigger-btn"
+                    >
+                      📷 Take Photo / Choose Image
+                    </button>
                     {formData.image && (
-                      <img 
-                        className="image-preview" 
-                        src={formData.image} 
-                        alt="Preview" 
-                        onError={handleImageError}
-                      />
+                      <div className="image-preview-container">
+                        <img 
+                          className="image-preview" 
+                          src={formData.image} 
+                          alt="Preview" 
+                          onError={handleImageError}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, image: '' }))}
+                          className="remove-image-btn"
+                          title="Remove image"
+                        >
+                          ×
+                        </button>
+                      </div>
                     )}
                   </div>
                 )}
@@ -432,6 +498,7 @@ export const Admin: React.FC = () => {
                   <th>{t('admin.quantity')}</th>
                   <th>{t('admin.unit')}</th>
                   <th>{t('admin.description')}</th>
+                  <th>Image</th>
                   <th>{t('admin.stock')}</th>
                   <th>{t('admin.actions')}</th>
                 </tr>
@@ -535,6 +602,89 @@ export const Admin: React.FC = () => {
                               return desc.length > 30 ? `${desc.substring(0, 30)}...` : desc;
                             })()}
                           </span>
+                        )}
+                      </td>
+                      <td>
+                        {isEditing ? (
+                          <div className="edit-image-cell">
+                            <div className="image-mode-toggle">
+                              <button
+                                type="button"
+                                className={`image-mode-btn ${editImageMode === 'url' ? 'active' : ''}`}
+                                onClick={() => setEditImageMode('url')}
+                              >
+                                URL
+                              </button>
+                              <button
+                                type="button"
+                                className={`image-mode-btn ${editImageMode === 'camera' ? 'active' : ''}`}
+                                onClick={() => setEditImageMode('camera')}
+                              >
+                                📷 Camera
+                              </button>
+                            </div>
+                            {editImageMode === 'url' ? (
+                              <input
+                                type="url"
+                                value={displayData.image || ''}
+                                onChange={(e) => handleEditChange('image', e.target.value)}
+                                className="edit-input"
+                                placeholder="Image URL"
+                                style={{ width: '200px', fontSize: '12px' }}
+                              />
+                            ) : (
+                              <div className="image-upload-row">
+                                <input
+                                  ref={editCameraInputRef}
+                                  type="file"
+                                  accept="image/*"
+                                  capture="environment"
+                                  onChange={handleEditCameraFile}
+                                  className="image-file-input"
+                                  style={{ display: 'none' }}
+                                />
+                                <button
+                                  type="button"
+                                  onClick={triggerEditCameraInput}
+                                  className="camera-trigger-btn"
+                                  style={{ fontSize: '11px', padding: '6px 10px' }}
+                                >
+                                  📷 Photo
+                                </button>
+                                {displayData.image && (
+                                  <div className="image-preview-container">
+                                    <img 
+                                      className="image-preview-small" 
+                                      src={displayData.image} 
+                                      alt="Preview" 
+                                      onError={handleImageError}
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => handleEditChange('image', '')}
+                                      className="remove-image-btn"
+                                      title="Remove image"
+                                    >
+                                      ×
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="product-image-cell">
+                            {product.image ? (
+                              <img 
+                                src={product.image} 
+                                alt={product.name}
+                                className="product-thumbnail"
+                                onError={handleImageError}
+                              />
+                            ) : (
+                              <span className="no-image">No Image</span>
+                            )}
+                          </div>
                         )}
                       </td>
                       <td>

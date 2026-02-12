@@ -264,6 +264,28 @@
   }
 }
 
+.cart-quantity-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #e8f5e9;
+  border: 2px solid #4caf50;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2e7d32;
+  margin-bottom: 4px;
+}
+
+.cart-badge-icon {
+  font-size: 16px;
+}
+
+.cart-badge-text {
+  white-space: nowrap;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .product-footer {

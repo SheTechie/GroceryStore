@@ -1,15 +1,20 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { OAuthUser } from '../services/oauthService';
 
 interface User {
   id: string;
   username: string;
+  email?: string;
   role: 'admin' | 'user';
+  picture?: string;
+  provider?: 'google' | 'github' | 'facebook' | 'local';
 }
 
 interface AuthContextType {
   user: User | null;
   login: (username: string, password: string) => boolean;
+  loginWithOAuth: (oauthUser: OAuthUser) => void;
   logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
@@ -40,8 +45,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return false;
   };
 
+  const loginWithOAuth = (oauthUser: OAuthUser) => {
+    // Convert OAuth user to app user format
+    const newUser: User = {
+      id: oauthUser.id,
+      username: oauthUser.name,
+      email: oauthUser.email,
+      role: 'user', // OAuth users are regular users by default
+      picture: oauthUser.picture,
+      provider: oauthUser.provider,
+    };
+    setUser(newUser);
+  };
+
   const logout = () => {
     setUser(null);
+    // Clear OAuth session data
+    sessionStorage.removeItem('oauth_state');
+    sessionStorage.removeItem('oauth_provider');
   };
 
   const isAuthenticated = user !== null;
@@ -52,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         login,
+        loginWithOAuth,
         logout,
         isAuthenticated,
         isAdmin,

@@ -33,6 +33,31 @@
   font-size: 14px;
 }
 
+.oauth-section {
+  margin-bottom: 24px;
+}
+
+.oauth-divider {
+  display: flex;
+  align-items: center;
+  margin: 24px 0;
+  text-align: center;
+}
+
+.oauth-divider::before,
+.oauth-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.oauth-divider span {
+  padding: 0 16px;
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+}
+
 .login-form {
   margin-bottom: 24px;
 }

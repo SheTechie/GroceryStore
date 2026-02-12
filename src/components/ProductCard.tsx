@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Product } from '../types';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useSettings } from '../context/SettingsContext';
 import { formatCurrency } from '../utils/currency';
 import { getUnitDisplayName } from '../utils/formatQuantity';
-import { getUnitKind, normalizeCartQuantity } from '../utils/units';
+import { getUnitKind, normalizeCartQuantity, formatCartQuantity } from '../utils/units';
 import './ProductCard.css';
 
 interface ProductCardProps {
@@ -13,11 +13,15 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const { addToCart } = useCart();
+  const { addToCart, updateQuantity, items } = useCart();
   const { t } = useLanguage();
   const { showPrices } = useSettings();
-  const [isAdded, setIsAdded] = useState(false);
   const unitKind = getUnitKind(product.unit);
+  
+  // Check if product is in cart and get its quantity
+  const cartItem = items.find(item => item.product.id === product.id);
+  const isInCart = !!cartItem;
+  const cartQuantity = cartItem?.quantity || 0;
 
   // For weight/volume we store base units (grams/ml) as qtyBase.
   // For packet/count we store number of packets/items as qtyBase.
@@ -29,6 +33,27 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const [kgInput, setKgInput] = useState<string>('0.5');
   // For volume products: store litre as decimal (e.g., 1.5 for 1.5 litre)
   const [litreInput, setLitreInput] = useState<string>('0.5');
+
+  // Sync dropdown values with cart quantity when item is in cart
+  useEffect(() => {
+    if (isInCart && cartQuantity > 0) {
+      if (product.unit === 'kg') {
+        const totalGrams = cartQuantity;
+        const kg = Math.floor(totalGrams / 1000);
+        const grams = totalGrams % 1000;
+        setKgSelected(kg);
+        setGramsSelected(grams);
+      } else if (unitKind === 'weight') {
+        const kg = cartQuantity / 1000;
+        setKgInput(kg.toFixed(1));
+      } else if (unitKind === 'volume') {
+        const litre = cartQuantity / 1000;
+        setLitreInput(litre.toFixed(1));
+      } else {
+        setQtyBase(cartQuantity);
+      }
+    }
+  }, [isInCart, cartQuantity, product.unit, unitKind]);
   
   const gramOptions = [0, 100, 200, 250, 300, 400, 500, 600, 700, 800, 900];
   const fallbackImage =
@@ -42,30 +67,45 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
        </svg>`
     );
 
-  const handleAddToCart = () => {
-    let quantityToAdd: number;
+  const calculateQuantity = (): number => {
     if (product.unit === 'kg') {
       // Convert kg + grams to total grams (e.g., 1 kg + 200g = 1200 grams)
-      quantityToAdd = (kgSelected * 1000) + gramsSelected;
-      // Minimum 100g
-      if (quantityToAdd < 100) {
-        quantityToAdd = 100;
-      }
+      const totalGrams = (kgSelected * 1000) + gramsSelected;
+      return Math.max(100, totalGrams); // Minimum 100g
     } else if (unitKind === 'weight') {
       // For other weight units (gram), use simple input
       const kg = parseFloat(kgInput || '0.5') || 0.5;
-      quantityToAdd = Math.max(100, Math.floor(kg * 1000));
+      return Math.max(100, Math.floor(kg * 1000));
     } else if (unitKind === 'volume') {
       // Convert litre to ml (e.g., 1.5 litre = 1500 ml)
       const litre = parseFloat(litreInput) || 0.5;
-      quantityToAdd = Math.max(100, Math.floor(litre * 1000)); // Minimum 100ml
+      return Math.max(100, Math.floor(litre * 1000)); // Minimum 100ml
     } else {
-      quantityToAdd = qtyBase;
+      return qtyBase;
     }
-    addToCart(product, quantityToAdd);
-    setIsAdded(true);
-    // Reset the "Added!" message after 2 seconds
-    setTimeout(() => setIsAdded(false), 2000);
+  };
+
+  const handleAddToCart = () => {
+    const quantityToAdd = calculateQuantity();
+    if (isInCart) {
+      // Update existing cart item quantity
+      updateQuantity(product.id, quantityToAdd);
+    } else {
+      // Add new item to cart
+      addToCart(product, quantityToAdd);
+    }
+  };
+
+  // Handle quantity change when item is in cart
+  const handleQuantityChange = () => {
+    if (isInCart) {
+      const newQuantity = calculateQuantity();
+      // Ensure minimum quantity
+      const minQuantity = product.unit === 'kg' || unitKind === 'weight' || unitKind === 'volume' ? 100 : 1;
+      if (newQuantity >= minQuantity) {
+        updateQuantity(product.id, newQuantity);
+      }
+    }
   };
 
   const decQty = () => setQtyBase(q => Math.max(1, (Number.isFinite(q) ? q : 1) - 1));
@@ -73,10 +113,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     const target = e.target as HTMLImageElement;
+    console.warn('Image failed to load:', target.src, 'for product:', product.name);
     if (target.src !== fallbackImage) {
       target.src = fallbackImage;
     }
   };
+
+  // Debug: Log image path for products with /images/ paths
+  useEffect(() => {
+    if (product.image && product.image.startsWith('/images/')) {
+      console.log(`Product ${product.id} (${product.name}) image:`, product.image);
+    }
+  }, [product.id, product.image, product.name]);
 
   return (
     <div className="product-card">
@@ -118,8 +166,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     <select
                       className="qty-select"
                       value={kgSelected}
-                      onChange={(e) => setKgSelected(Number(e.target.value) || 0)}
-                      disabled={isAdded || !product.inStock}
+                      onChange={(e) => {
+                        const newKg = Number(e.target.value) || 0;
+                        setKgSelected(newKg);
+                        if (isInCart) {
+                          // Use requestAnimationFrame for immediate update
+                          requestAnimationFrame(() => {
+                            handleQuantityChange();
+                          });
+                        }
+                      }}
+                      disabled={!product.inStock}
                       aria-label="Kilograms"
                     >
                       {Array.from({ length: 51 }).map((_, i) => (
@@ -134,8 +191,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     <select
                       className="qty-select"
                       value={gramsSelected}
-                      onChange={(e) => setGramsSelected(Number(e.target.value) || 0)}
-                      disabled={isAdded || !product.inStock}
+                      onChange={(e) => {
+                        const newGrams = Number(e.target.value) || 0;
+                        setGramsSelected(newGrams);
+                        if (isInCart) {
+                          // Use requestAnimationFrame for immediate update
+                          requestAnimationFrame(() => {
+                            handleQuantityChange();
+                          });
+                        }
+                      }}
+                      disabled={!product.inStock}
                       aria-label="Grams"
                     >
                       {gramOptions.map(g => (
@@ -171,8 +237,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                       } else {
                         setKgInput(Math.min(50, val).toString());
                       }
+                      if (isInCart) {
+                        handleQuantityChange();
+                      }
                     }}
-                    disabled={isAdded || !product.inStock}
+                    disabled={!product.inStock}
                     aria-label="Kilograms"
                     placeholder="0.5"
                   />
@@ -202,8 +271,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                       } else {
                         setLitreInput(Math.min(50, val).toString());
                       }
+                      if (isInCart) {
+                        handleQuantityChange();
+                      }
                     }}
-                    disabled={isAdded || !product.inStock}
+                    disabled={!product.inStock}
                     aria-label="Litres"
                     placeholder="0.5"
                   />
@@ -214,8 +286,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 <button
                   type="button"
                   className="qty-btn"
-                  onClick={decQty}
-                  disabled={isAdded || !product.inStock || qtyBase <= 1}
+                  onClick={() => {
+                    const newQty = Math.max(1, qtyBase - 1);
+                    setQtyBase(newQty);
+                    if (isInCart) {
+                      updateQuantity(product.id, newQty);
+                    }
+                  }}
+                  disabled={!product.inStock || qtyBase <= 1}
                   aria-label="Decrease quantity"
                 >
                   −
@@ -226,15 +304,27 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                   min={1}
                   max={99}
                   value={qtyBase}
-                  onChange={(e) => setQtyBase(Math.max(1, Math.min(99, Math.floor(Number(e.target.value) || 1))))}
-                  disabled={isAdded || !product.inStock}
+                  onChange={(e) => {
+                    const newVal = Math.max(1, Math.min(99, Math.floor(Number(e.target.value) || 1)));
+                    setQtyBase(newVal);
+                    if (isInCart) {
+                      setTimeout(() => updateQuantity(product.id, newVal), 0);
+                    }
+                  }}
+                  disabled={!product.inStock}
                   aria-label="Quantity"
                 />
                 <button
                   type="button"
                   className="qty-btn"
-                  onClick={incQty}
-                  disabled={isAdded || !product.inStock || qtyBase >= 99}
+                  onClick={() => {
+                    const newQty = Math.min(99, qtyBase + 1);
+                    setQtyBase(newQty);
+                    if (isInCart) {
+                      updateQuantity(product.id, newQty);
+                    }
+                  }}
+                  disabled={!product.inStock || qtyBase >= 99}
                   aria-label="Increase quantity"
                 >
                   +
@@ -242,11 +332,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               </div>
             )}
             <button
-              className={`add-to-cart-btn ${isAdded ? 'added' : ''}`}
+              className={`add-to-cart-btn ${isInCart ? 'added' : ''}`}
               onClick={handleAddToCart}
-              disabled={!product.inStock || isAdded}
+              disabled={!product.inStock}
             >
-              {isAdded ? `✓ ${t('product.added')}` : product.inStock ? t('product.add.to.cart') : t('product.unavailable')}
+              {isInCart 
+                ? `✓ ${t('product.added')}` 
+                : product.inStock 
+                  ? t('product.add.to.cart') 
+                  : t('product.unavailable')}
             </button>
           </div>
         </div>

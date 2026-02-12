@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { OAuthButton } from '../components/OAuthButton';
 import './Login.css';
 
 export const Login: React.FC = () => {
@@ -42,6 +43,18 @@ export const Login: React.FC = () => {
         <div className="login-card">
           <h1>{t('login.title')}</h1>
           <p className="login-subtitle">{t('login.subtitle')}</p>
+
+          {/* OAuth Login Section */}
+          <div className="oauth-section">
+            <OAuthButton provider="google" />
+            {/* Uncomment when ready to add more providers */}
+            {/* <OAuthButton provider="github" /> */}
+            {/* <OAuthButton provider="facebook" /> */}
+            
+            <div className="oauth-divider">
+              <span>OR</span>
+            </div>
+          </div>
 
           <form onSubmit={handleSubmit} className="login-form">
             {error && <div className="error-message">{error}</div>}

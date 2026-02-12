@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useProducts } from '../hooks/useProducts';
 import { ProductList } from '../components/ProductList';
 import { Category } from '../types';
@@ -7,6 +7,7 @@ import { productService } from '../services/api';
 import { useProductsContext } from '../context/ProductContext';
 import { formatCategoryName } from '../utils/formatCategory';
 import { useLanguage } from '../context/LanguageContext';
+import { useVoiceSearch } from '../hooks/useVoiceSearch';
 import './Products.css';
 
 export const Products: React.FC = () => {
@@ -17,6 +18,19 @@ export const Products: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredProducts, setFilteredProducts] = useState(products);
   const debouncedSearch = useDebounce(searchQuery, 300);
+
+  // Voice search handler
+  const handleVoiceResult = useCallback((text: string) => {
+    setSearchQuery(text);
+  }, []);
+
+  const {
+    isListening,
+    error: voiceError,
+    startListening,
+    stopListening,
+    isSupported: isVoiceSupported,
+  } = useVoiceSearch(handleVoiceResult);
 
   const categories: (Category | 'all')[] = ['all', 'staples', 'pulses', 'spices', 'oil', 'snacks', 'beverages', 'household', 'personal-care', 'miscellaneous'];
 
@@ -50,13 +64,34 @@ export const Products: React.FC = () => {
 
       <div className="filters-section">
         <div className="search-bar">
-          <input
-            type="text"
-            placeholder={t('home.search.placeholder')}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="search-input"
-          />
+          <div className="search-input-wrapper">
+            <input
+              type="text"
+              placeholder={t('home.search.placeholder')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="search-input"
+            />
+            {isVoiceSupported && (
+              <button
+                type="button"
+                className={`voice-search-btn ${isListening ? 'listening' : ''}`}
+                onClick={isListening ? stopListening : startListening}
+                title={isListening ? 'Stop listening' : 'Start voice search'}
+                aria-label={isListening ? 'Stop listening' : 'Start voice search'}
+              >
+                {isListening ? '⏹️' : '🎤'}
+              </button>
+            )}
+          </div>
+          {voiceError && (
+            <div className="voice-error">{voiceError}</div>
+          )}
+          {isListening && (
+            <div className="voice-listening-indicator">
+              🎤 Listening... Speak now
+            </div>
+          )}
         </div>
 
         <div className="category-filters">
