@@ -20,7 +20,6 @@
   ],
   "env": {
     "NODE_OPTIONS": "--no-deprecation",
-    "NPM_CONFIG_LOGLEVEL": "error",
-    "CI": "false"
+    "NPM_CONFIG_LOGLEVEL": "error"
   }
 }
