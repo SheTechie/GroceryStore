@@ -1,7 +1,7 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { CartItem, Product } from '../types';
 import { useLocalStorage } from '../hooks/useLocalStorage';
-import { getLineTotal, getUnitKind, normalizeCartQuantity } from '../utils/units';
+import { getLineTotal, normalizeCartQuantity } from '../utils/units';
 
 interface CartContextType {
   items: CartItem[];

@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useSettings } from '../context/SettingsContext';
 import { formatCurrency } from '../utils/currency';
 import { getUnitDisplayName } from '../utils/formatQuantity';
-import { getUnitKind, normalizeCartQuantity, formatCartQuantity } from '../utils/units';
+import { getUnitKind, normalizeCartQuantity } from '../utils/units';
 import './ProductCard.css';
 
 interface ProductCardProps {
@@ -107,9 +107,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       }
     }
   };
-
-  const decQty = () => setQtyBase(q => Math.max(1, (Number.isFinite(q) ? q : 1) - 1));
-  const incQty = () => setQtyBase(q => Math.min(99, (Number.isFinite(q) ? q : 1) + 1));
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     const target = e.target as HTMLImageElement;

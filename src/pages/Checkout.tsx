@@ -49,6 +49,7 @@ export const Checkout: React.FC = () => {
   const finalTotal = total + deliveryCharge;
 
   // Check delivery availability when zipcode, address, or delivery type changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (formData.deliveryType === 'delivery' && formData.zipCode.trim().length === 6) {
       checkDelivery();

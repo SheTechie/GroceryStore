@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { PaymentMethod, CardPaymentData, UPIPaymentData, WalletPaymentData, PaymentData, PaymentResponse } from '../types';
 import { paymentService } from '../services/paymentService';
 import { initializeRazorpayPayment } from '../services/razorpayService';
