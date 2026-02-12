@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { CheckoutFormData, PaymentResponse, DeliveryType } from '../types';
@@ -49,48 +49,45 @@ export const Checkout: React.FC = () => {
   const finalTotal = total + deliveryCharge;
 
   // Check delivery availability when zipcode, address, or delivery type changes
-const checkDelivery = useCallback(async () => {
-  setDeliveryStatus({ checking: true, available: false });
+  useEffect(() => {
+    const runDeliveryCheck = async () => {
+      if (
+        formData.deliveryType === 'delivery' &&
+        formData.zipCode.trim().length === 6
+      ) {
+        setDeliveryStatus({ checking: true, available: false });
 
-  const result = await checkDeliveryAvailability(
-    formData.zipCode,
-    formData.address,
-    formData.city
-  );
+        const result = await checkDeliveryAvailability(
+          formData.zipCode,
+          formData.address,
+          formData.city
+        );
 
-  const charge = result.available && result.distance
-      ? calculateDeliveryCharge(total, result.distance)
-      : 0;
+        const charge =
+          result.available && result.distance
+            ? calculateDeliveryCharge(total, result.distance)
+            : 0;
 
-  setDeliveryStatus({
-    checking: false,
-    available: result.available,
-    message: result.message,
-    distance: result.distance,
-    deliveryCharge: charge,
-  });
+        setDeliveryStatus({
+          checking: false,
+          available: result.available,
+          message: result.message,
+          distance: result.distance,
+          deliveryCharge: charge,
+        });
+      } else {
+        setDeliveryStatus({ checking: false, available: true });
+      }
+    };
+
+  runDeliveryCheck();
 }, [
+  formData.deliveryType,
   formData.zipCode,
   formData.address,
   formData.city,
   total
 ]);
-
-useEffect(() => {
-  if (
-    formData.deliveryType === 'delivery' &&
-    formData.zipCode.trim().length === 6
-  ) {
-    checkDelivery();
-  } else {
-    setDeliveryStatus({ checking: false, available: true });
-  }
-}, [
-  formData.deliveryType,
-  formData.zipCode,
-  checkDelivery
-]);
-
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
